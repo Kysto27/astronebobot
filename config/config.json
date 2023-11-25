@@ -1,0 +1,27 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "opalh1q6",
+    "database": "telegram",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "opalh1q6",
+    "database": "telegram_test",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "opalh1q6",
+    "database": "telegram_production",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  }
+}
+
