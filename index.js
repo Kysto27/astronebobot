@@ -6,8 +6,8 @@ require('./bot/middleware/scene/index.scene');
 // COMMANDS
 require('./bot/middleware/command/commands.command');
 require('./bot/middleware/command/start.command');
-require('./bot/middleware/command/help.command');
-require('./bot/middleware/command/setting.command');
+require('./bot/middleware/command/taro.command');
+require('./bot/middleware/command/compatibility.command');
 
 // HEARS
 require('./bot/middleware/hears/one.hears');

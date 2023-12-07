@@ -2,6 +2,7 @@ const { Markup } = require('telegraf');
 const bot = require('../../connection/token.connection');
 const db = require('../../connection/db.connection');
 const UserModel = require('../../model/user.model');
+const path = require('path');
 
 module.exports = bot.start(async (ctx) => {
   try {
@@ -43,14 +44,24 @@ module.exports = bot.start(async (ctx) => {
       });
 
       console.log(`Новый пользователь с chatID: ${chatID} создан.`);
+
+      const imagePath = path.join(__dirname, '../../middleware/data/images/start-picture.jpg');
+      await ctx.replyWithPhoto(
+        { source: imagePath },
+        {
+          caption: `<b>🌟ДОБРО ПОЖАЛОВАТЬ🌟</b>\n\nМы приветствуем Вас в авторском телеграм боте канала @nebo_prognoz, с помощью которого вы можете:\n\n🔮 Узнать свой персональный гороскоп на 2024 год\n\n👩‍❤️‍👨 Рассчитать совместимость пары по знаку зодиака\n\n♠️ Сделать расклад ТАРО`,
+          parse_mode: 'HTML',
+        }
+      );
     }
-    return await ctx.reply(
-      'Добро пожаловать в Астрологического бота, выберите что вы хотите сделать',
-      Markup.keyboard([['Раccчитать совместимость']])
+
+    // Отправка клавиатуры в отдельном сообщении
+    return await ctx.replyWithHTML(
+      `Выбирайте доступные функции в <b>МЕНЮ</b> 👇👇👇`,
+      Markup.keyboard([['Рассчитать совместимость'], ['Расклад ТАРО']])
         .oneTime()
         .resize()
     );
-    // return ctx.replyWithHTML(`Hi, <b>${firstName}</b>!`);
   } catch (e) {
     console.error(`Ошибка при выполнении команды start:`, e);
   }

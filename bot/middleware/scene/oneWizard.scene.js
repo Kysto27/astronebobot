@@ -1,19 +1,24 @@
 const { Markup, Scenes, Composer } = require('telegraf');
 const { createZodiacSignsKeyboard } = require('../helpers/zodiacSignsKeyboard.js');
 const { ZodiacSign, ZodiacCompatibility } = require('../../../models/index.js');
+const UserModel = require('../../model/user.model.js');
 
 const chooseWomanSignStep = new Composer();
-chooseWomanSignStep.hears('Раccчитать совместимость', async (ctx) => {
+
+chooseWomanSignStep.hears('Рассчитать совместимость', enterWomanSignStep);
+chooseWomanSignStep.command('compatibility', enterWomanSignStep);
+
+async function enterWomanSignStep(ctx) {
   try {
     ctx.wizard.state.formData = {};
-    await ctx.reply('Выберите знак зодиака Женщины', {
+    await ctx.replyWithHTML(`<b>💃 Выберите знак зодиака Женщины</b>`, {
       reply_markup: createZodiacSignsKeyboard(),
     });
     return ctx.wizard.next();
   } catch (e) {
     console.log(e);
   }
-});
+}
 
 const chooseManSignStep = new Composer();
 chooseManSignStep.action(/^\d{1,2}$/, async (ctx) => {
@@ -22,14 +27,14 @@ chooseManSignStep.action(/^\d{1,2}$/, async (ctx) => {
   try {
     const zodiacSign = await ZodiacSign.findByPk(zodiacSignId);
     if (zodiacSign) {
-      await ctx.reply(`Вы выбрали знак зодиака Женщины: ${zodiacSign.name}`);
+      await ctx.reply(`Вы выбрали знак зодиака Женщины - ${zodiacSign.emoji} ${zodiacSign.name}`);
     } else {
       await ctx.reply('Знак зодиака не найден');
     }
   } catch (error) {
     console.error('Ошибка при запросе к базе данных:', error);
   }
-  await ctx.reply('Выберите знак зодиака Мужчины', {
+  await ctx.replyWithHTML(`<b>👨‍🦳 Теперь выберите знак зодиака Мужчины</b>`, {
     reply_markup: createZodiacSignsKeyboard(),
   });
   return ctx.wizard.next();
@@ -47,7 +52,9 @@ compatibilityCalcStep.action(/^\d{1,2}$/, async (ctx) => {
     if (!zodiacManSign) {
       await ctx.reply('Знак зодиака Мужчины не найден');
     } else {
-      await ctx.reply(`Вы выбрали знак зодиака Мужчины: ${zodiacManSign.name}`);
+      await ctx.reply(
+        `Вы выбрали знак зодиака Мужчины - ${zodiacManSign.emoji} ${zodiacManSign.name}`
+      );
     }
   } catch (error) {
     console.error('Ошибка при запросе к базе данных:', error);
@@ -63,8 +70,8 @@ compatibilityCalcStep.action(/^\d{1,2}$/, async (ctx) => {
   }
 
   if (zodiacWomanSign && zodiacManSign) {
-    await ctx.reply(
-      `Теперь вы можете рассчитать совместимость: Женщина - ${zodiacWomanSign.name} и Мужчина - ${zodiacManSign.name}`,
+    await ctx.replyWithHTML(
+      `Теперь нажмите кнопку, чтобы рассчитать совместимость:\n\nЖенщина - ${zodiacWomanSign.name} ${zodiacWomanSign.emoji} + ${zodiacManSign.emoji} ${zodiacManSign.name} - Мужчина`,
       Markup.inlineKeyboard([
         Markup.button.callback('Рассчитать совместимость', 'calculate_compatibility'),
       ])
@@ -80,6 +87,7 @@ finishStep.action('calculate_compatibility', async (ctx) => {
     await ctx.answerCbQuery();
     const zodiacWomanSignId = ctx.wizard.state.formData.womanZodiacSign;
     const zodiacManSignId = ctx.wizard.state.formData.manZodiacSign;
+    const chatID = ctx.update.callback_query.from.id; // Получение chatID пользователя
 
     // Запрос к базе данных для получения данных о совместимости
     const compatibility = await ZodiacCompatibility.findOne({
@@ -99,6 +107,9 @@ finishStep.action('calculate_compatibility', async (ctx) => {
     } else {
       await ctx.reply('Данные о совместимости не найдены');
     }
+
+    // Увеличиваем счетчик расчетов совместимости для пользователя
+    await UserModel.increment('compatibilityCalculationsCount', { by: 1, where: { chatID } });
 
     return ctx.scene.leave();
   } catch (e) {

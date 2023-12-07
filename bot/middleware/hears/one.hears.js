@@ -1,3 +1,4 @@
-const bot = require("../../connection/token.connection");
+const bot = require('../../connection/token.connection');
 
-module.exports = bot.hears("Раccчитать совместимость", async (ctx) => ctx.scene.enter("oneWizard"));
+bot.hears('Рассчитать совместимость', async (ctx) => ctx.scene.enter("oneWizard"));
+bot.command('compatibility', async (ctx) => ctx.scene.enter("oneWizard"));
