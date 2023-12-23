@@ -16,12 +16,11 @@
     "dialect": "postgres"
   },
   "production": {
-    "username": "postgres",
-    "password": "opalh1q6",
-    "database": "telegram_production",
+    "username": "kysto27",
+    "password": "B#5yBYUU%lPp",
+    "database": "bd_neboprognozbot",
     "host": "localhost",
     "port": 5432,
     "dialect": "postgres"
   }
 }
-
