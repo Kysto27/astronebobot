@@ -1,29 +1,26 @@
 {
   "development": {
-    "username": "kysto27",
-    "password": "B#5yBYUU%lPp",
-    "database": "bd_neboprognozbot",
+    "username": "postgres",
+    "password": "opalh1q6",
+    "database": "telegram-test",
     "host": "localhost",
     "port": 5432,
     "dialect": "postgres"
   },
   "test": {
-    "username": "kysto27",
-    "password": "B#5yBYUU%lPp",
-    "database": "bd_neboprognozbot",
+    "username": "postgres",
+    "password": "opalh1q6",
+    "database": "telegram-test",
     "host": "localhost",
     "port": 5432,
     "dialect": "postgres"
   },
   "production": {
-    "username": "kysto27",
-    "password": "B#5yBYUU%lPp",
-    "database": "bd_neboprognozbot",
+    "username": "postgres",
+    "password": "opalh1q6",
+    "database": "telegram",
     "host": "localhost",
     "port": 5432,
     "dialect": "postgres"
   }
 }
-
-
-

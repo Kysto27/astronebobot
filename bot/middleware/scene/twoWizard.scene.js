@@ -2,6 +2,7 @@ const { Markup, Scenes, Composer } = require('telegraf');
 const path = require('path');
 const { TarotCard } = require('../../../models/index.js');
 const Sequelize = require('sequelize');
+const UserModel = require('../../model/user.model.js');
 
 const startStep = new Composer();
 
@@ -65,6 +66,7 @@ chartSelection.action('expect', async (ctx) => {
 const interpretation = new Composer();
 interpretation.action('take-card-yes-no', async (ctx) => {
   try {
+    const chatID = ctx.update.callback_query.from.id;
     const randomCard = await TarotCard.findOne({
       order: Sequelize.literal('RANDOM()')
     });
@@ -81,6 +83,7 @@ interpretation.action('take-card-yes-no', async (ctx) => {
       await ctx.replyWithPhoto({ source: imagePath });
       await ctx.replyWithHTML(`<b>${randomCard.name_ru}</b>\n\n${description}`);
     }
+    await UserModel.increment('tarotrequestscount', { by: 1, where: { chatID } });
     // return ctx.wizard.next();
     return ctx.scene.leave();
   } catch (e) {
@@ -90,6 +93,7 @@ interpretation.action('take-card-yes-no', async (ctx) => {
 
 interpretation.action('take-card-expect', async (ctx) => {
   try {
+    const chatID = ctx.update.callback_query.from.id;
     const randomCard = await TarotCard.findOne({
       order: Sequelize.literal('RANDOM()')
     });
@@ -107,6 +111,7 @@ interpretation.action('take-card-expect', async (ctx) => {
       await ctx.replyWithHTML(`<b>${randomCard.name_ru}</b>\n\n${description}`);
     }
     // return ctx.wizard.next();
+    await UserModel.increment('tarotrequestscount', { by: 1, where: { chatID } });
     return ctx.scene.leave();
   } catch (e) {
     console.log(e);

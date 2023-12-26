@@ -35,6 +35,16 @@ module.exports = db.define(
       allowNull: false,
       defaultValue: 0,
     },
+    horoscoperequestscount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    tarotrequestscount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
   },
   {
     timestamps: true,
