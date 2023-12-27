@@ -3,13 +3,29 @@ const path = require('path');
 const { TarotCard } = require('../../../models/index.js');
 const Sequelize = require('sequelize');
 const UserModel = require('../../model/user.model.js');
+const checkUserSubscription = require('../helpers/subscriptionChecker');
 
 const startStep = new Composer();
 
-startStep.hears('Расклад ТАРО', enterStartStep);
-startStep.command('taro', enterStartStep);
+startStep.use(async (ctx, next) => {
+  const chatID = ctx.from.id;
+  const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
 
-async function enterStartStep (ctx) {
+  if (!isSubscribed) {
+    await ctx.replyWithHTML(
+      'Для использования бота нужно подписаться на канал @nebo_prognoz',
+      Markup.inlineKeyboard([Markup.button.callback('Проверить подписку', 'check_subscription')])
+    );
+  } else {
+    await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
+    await enterStartStep(ctx);
+  }
+});
+
+// startStep.hears('Расклад ТАРО', enterStartStep);
+// startStep.command('taro', enterStartStep);
+
+async function enterStartStep(ctx) {
   try {
     ctx.wizard.state.formData = {};
     await ctx.replyWithHTML(
@@ -29,7 +45,7 @@ async function enterStartStep (ctx) {
   } catch (e) {
     console.log(e);
   }
-};
+}
 
 const chartSelection = new Composer();
 
@@ -68,7 +84,7 @@ interpretation.action('take-card-yes-no', async (ctx) => {
   try {
     const chatID = ctx.update.callback_query.from.id;
     const randomCard = await TarotCard.findOne({
-      order: Sequelize.literal('RANDOM()')
+      order: Sequelize.literal('RANDOM()'),
     });
     if (randomCard) {
       const imagePath = path.join(
@@ -95,7 +111,7 @@ interpretation.action('take-card-expect', async (ctx) => {
   try {
     const chatID = ctx.update.callback_query.from.id;
     const randomCard = await TarotCard.findOne({
-      order: Sequelize.literal('RANDOM()')
+      order: Sequelize.literal('RANDOM()'),
     });
     if (randomCard) {
       const imagePath = path.join(
@@ -129,6 +145,6 @@ module.exports = new Scenes.WizardScene(
   'twoWizard',
   startStep,
   chartSelection,
-  interpretation,
+  interpretation
   // finishStep
 );

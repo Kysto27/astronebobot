@@ -2,11 +2,28 @@ const { Markup, Scenes, Composer } = require('telegraf');
 const { createZodiacSignsKeyboard } = require('../helpers/zodiacSignsKeyboard.js');
 const { ZodiacSign, ZodiacCompatibility } = require('../../../models/index.js');
 const UserModel = require('../../model/user.model.js');
+const checkUserSubscription = require('../helpers/subscriptionChecker');
 
 const chooseWomanSignStep = new Composer();
 
-chooseWomanSignStep.hears('Рассчитать совместимость', enterWomanSignStep);
-chooseWomanSignStep.command('compatibility', enterWomanSignStep);
+chooseWomanSignStep.use(async (ctx, next) => {
+  const chatID = ctx.from.id;
+  const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
+
+  if (!isSubscribed) {
+    await ctx.replyWithHTML(
+      'Для использования бота нужно подписаться на канал @nebo_prognoz',
+      Markup.inlineKeyboard([Markup.button.callback('Проверить подписку', 'check_subscription')])
+    );
+  } else {
+    await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
+    await enterWomanSignStep(ctx);
+  }
+});
+
+
+// chooseWomanSignStep.hears('Рассчитать совместимость', enterWomanSignStep);
+// chooseWomanSignStep.command('compatibility', enterWomanSignStep);
 
 async function enterWomanSignStep(ctx) {
   try {

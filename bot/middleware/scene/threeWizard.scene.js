@@ -4,11 +4,27 @@ const { getZodiacSignInGenitive } = require('../helpers/zodiacSignInGenitive.js'
 const { getHoroscope } = require('../helpers/getHoroscope.js');
 const { ZodiacSign } = require('../../../models/index.js');
 const UserModel = require('../../model/user.model.js');
+const checkUserSubscription = require('../helpers/subscriptionChecker');
 
 const startStep = new Composer();
 
-startStep.hears('Гороскоп', enterStartStep);
-startStep.command('horoscope', enterStartStep);
+startStep.use(async (ctx, next) => {
+  const chatID = ctx.from.id;
+  const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
+
+  if (!isSubscribed) {
+    await ctx.replyWithHTML(
+      'Для использования бота нужно подписаться на канал @nebo_prognoz',
+      Markup.inlineKeyboard([Markup.button.callback('Проверить подписку', 'check_subscription')])
+    );
+  } else {
+    await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
+    await enterStartStep(ctx);
+  }
+});
+
+// startStep.hears('Гороскоп', enterStartStep);
+// startStep.command('horoscope', enterStartStep);
 
 async function enterStartStep(ctx) {
   try {

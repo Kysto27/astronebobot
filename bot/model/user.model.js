@@ -45,6 +45,10 @@ module.exports = db.define(
       allowNull: false,
       defaultValue: 0,
     },
+    subscribeneboprognoz: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     timestamps: true,

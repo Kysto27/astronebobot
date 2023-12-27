@@ -3,6 +3,7 @@ const bot = require('../../connection/token.connection');
 const db = require('../../connection/db.connection');
 const UserModel = require('../../model/user.model');
 const path = require('path');
+const checkUserSubscription = require('../../middleware/helpers/subscriptionChecker.js');
 
 module.exports = bot.start(async (ctx) => {
   try {
@@ -55,6 +56,35 @@ module.exports = bot.start(async (ctx) => {
       );
     }
 
+    // Проверка подписки на канал
+    const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
+
+    if (!isSubscribed) {
+      await ctx.replyWithHTML(
+        'Для использования бота нужно подписаться на канал @nebo_prognoz',
+        Markup.inlineKeyboard([Markup.button.callback('Проверить подписку', 'check_subscription')])
+      );
+      return;
+    } else {
+      await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
+    }
+
+    bot.action('check_subscription', async (ctx) => {
+      const chatID = ctx.from.id;
+      const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
+      if (isSubscribed) {
+        await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
+        ctx.reply('Проверка пройдена. Добро пожаловать!');
+      } else {
+        ctx.replyWithHTML(
+          'Проверка не пройдена, необходимо подписаться на канал @nebo_prognoz',
+          Markup.inlineKeyboard([
+            Markup.button.callback('Проверить подписку', 'check_subscription'),
+          ])
+        );
+      }
+    });
+
     // Отправка клавиатуры в отдельном сообщении
     return await ctx.replyWithHTML(
       `Выбирайте доступные функции в <b>МЕНЮ</b> 👇👇👇`,
@@ -66,3 +96,20 @@ module.exports = bot.start(async (ctx) => {
     console.error(`Ошибка при выполнении команды start:`, e);
   }
 });
+
+// Вспомогательная функция для проверки подписки
+// async function checkUserSubscription(ctx, channel) {
+//   try {
+//     const userId = ctx.from.id;
+//     const member = await ctx.telegram.getChatMember(channel, userId);
+//     return (
+//       member &&
+//       (member.status === 'member' ||
+//         member.status === 'administrator' ||
+//         member.status === 'creator')
+//     );
+//   } catch (error) {
+//     console.error('Ошибка при проверке подписки:', error);
+//     return false;
+//   }
+// }
