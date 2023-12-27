@@ -15,25 +15,25 @@ module.exports = bot.start(async (ctx) => {
     const lastName = ctx.chat.last_name ?? 'anon2';
     const username = ctx.chat.username;
 
-    console.log(`Проверка пользователя с chatID: ${chatID}`);
+    // console.log(`Проверка пользователя с chatID: ${chatID}`);
     const foundUser = await UserModel.findOne({ where: { chatID: ctx.chat.id } });
 
     if (foundUser) {
-      console.log(`Пользователь с chatID: ${chatID} уже существует.`);
+      // console.log(`Пользователь с chatID: ${chatID} уже существует.`);
       if (foundUser.username !== username) {
-        console.log(`Обновление информации пользователя с chatID: ${chatID}`);
+        // console.log(`Обновление информации пользователя с chatID: ${chatID}`);
         await UserModel.update({ username }, { where: { chatID } });
       }
     } else {
-      console.log(`Пользователь с chatID: ${chatID} не найден. Создается новый пользователь.`);
-      console.log(`Данные для записи:`, {
-        chatID: chatID,
-        firstName: firstName,
-        lastName: lastName,
-        username: username,
-        admin: false,
-        startPayload: startPayload,
-      });
+      // console.log(`Пользователь с chatID: ${chatID} не найден. Создается новый пользователь.`);
+      // console.log(`Данные для записи:`, {
+      //   chatID: chatID,
+      //   firstName: firstName,
+      //   lastName: lastName,
+      //   username: username,
+      //   admin: false,
+      //   startPayload: startPayload,
+      // });
 
       await UserModel.create({
         chatID: chatID,
@@ -44,7 +44,7 @@ module.exports = bot.start(async (ctx) => {
         startPayload: startPayload,
       });
 
-      console.log(`Новый пользователь с chatID: ${chatID} создан.`);
+      // console.log(`Новый пользователь с chatID: ${chatID} создан.`);
 
       const imagePath = path.join(__dirname, '../../middleware/data/images/start-picture.jpg');
       await ctx.replyWithPhoto(
@@ -59,6 +59,8 @@ module.exports = bot.start(async (ctx) => {
     // Проверка подписки на канал
     const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
 
+    // console.log(isSubscribed);
+
     if (!isSubscribed) {
       await ctx.replyWithHTML(
         'Для использования бота нужно подписаться на канал @nebo_prognoz',
@@ -68,22 +70,6 @@ module.exports = bot.start(async (ctx) => {
     } else {
       await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
     }
-
-    bot.action('check_subscription', async (ctx) => {
-      const chatID = ctx.from.id;
-      const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
-      if (isSubscribed) {
-        await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
-        ctx.reply('Проверка пройдена. Добро пожаловать!');
-      } else {
-        ctx.replyWithHTML(
-          'Проверка не пройдена, необходимо подписаться на канал @nebo_prognoz',
-          Markup.inlineKeyboard([
-            Markup.button.callback('Проверить подписку', 'check_subscription'),
-          ])
-        );
-      }
-    });
 
     // Отправка клавиатуры в отдельном сообщении
     return await ctx.replyWithHTML(
@@ -96,20 +82,3 @@ module.exports = bot.start(async (ctx) => {
     console.error(`Ошибка при выполнении команды start:`, e);
   }
 });
-
-// Вспомогательная функция для проверки подписки
-// async function checkUserSubscription(ctx, channel) {
-//   try {
-//     const userId = ctx.from.id;
-//     const member = await ctx.telegram.getChatMember(channel, userId);
-//     return (
-//       member &&
-//       (member.status === 'member' ||
-//         member.status === 'administrator' ||
-//         member.status === 'creator')
-//     );
-//   } catch (error) {
-//     console.error('Ошибка при проверке подписки:', error);
-//     return false;
-//   }
-// }

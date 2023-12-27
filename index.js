@@ -16,6 +16,7 @@ require('./bot/middleware/hears/two.hears');
 require('./bot/middleware/hears/three.hears');
 
 // ACTION
+require('./bot/middleware/action/checkSubscriptionAction');
 
 // CONNECTION
 require('./bot/connection/local.connection');
