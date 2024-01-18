@@ -4,27 +4,14 @@ const { getZodiacSignInGenitive } = require('../helpers/zodiacSignInGenitive.js'
 const { getHoroscope } = require('../helpers/getHoroscope.js');
 const { ZodiacSign } = require('../../../models/index.js');
 const UserModel = require('../../model/user.model.js');
-const checkUserSubscription = require('../helpers/subscriptionChecker');
+const { handleSubscription } = require('../helpers/sceneSubscription.js');
 
 const startStep = new Composer();
 
 startStep.use(async (ctx, next) => {
-  const chatID = ctx.from.id;
-  const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
-
-  if (!isSubscribed) {
-    await ctx.replyWithHTML(
-      'Для использования бота нужно подписаться на канал @nebo_prognoz',
-      Markup.inlineKeyboard([Markup.button.callback('Проверить подписку', 'check_subscription')])
-    );
-  } else {
-    await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
-    await enterStartStep(ctx);
-  }
+  await handleSubscription(ctx, enterStartStep);
 });
 
-// startStep.hears('Гороскоп', enterStartStep);
-// startStep.command('horoscope', enterStartStep);
 
 async function enterStartStep(ctx) {
   try {
@@ -88,7 +75,7 @@ horoscopeStep.action(/(\d+)/, async (ctx) => {
     const gender = ctx.wizard.state.formData.gender === 'муж' ? 'мужчины' : 'женщины';
     const zodiacSignNameInGenitive = getZodiacSignInGenitive(zodiacSign.name);
     const horoscope = await getHoroscope(zodiacSign.id, ctx.wizard.state.formData.gender);
-    
+
     if (horoscope) {
       await ctx.replyWithHTML(
         `<b>Гороскоп для ${gender} - ${zodiacSignNameInGenitive} ${

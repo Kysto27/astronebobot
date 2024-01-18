@@ -4,6 +4,7 @@ const db = require('../../connection/db.connection');
 const UserModel = require('../../model/user.model');
 const path = require('path');
 const checkUserSubscription = require('../../middleware/helpers/subscriptionChecker.js');
+const { promptSubscription } = require('../../middleware/helpers/promptSubscription.js');
 
 module.exports = bot.start(async (ctx) => {
   try {
@@ -15,36 +16,24 @@ module.exports = bot.start(async (ctx) => {
     const lastName = ctx.chat.last_name ?? 'anon2';
     const username = ctx.chat.username;
 
-    // console.log(`Проверка пользователя с chatID: ${chatID}`);
     const foundUser = await UserModel.findOne({ where: { chatID: ctx.chat.id } });
 
     if (foundUser) {
-      // console.log(`Пользователь с chatID: ${chatID} уже существует.`);
       if (foundUser.username !== username) {
-        // console.log(`Обновление информации пользователя с chatID: ${chatID}`);
         await UserModel.update({ username }, { where: { chatID } });
       }
+      if (chatID === '326045360') {
+        await UserModel.update({ admin: true }, { where: { chatID } });
+      }
     } else {
-      // console.log(`Пользователь с chatID: ${chatID} не найден. Создается новый пользователь.`);
-      // console.log(`Данные для записи:`, {
-      //   chatID: chatID,
-      //   firstName: firstName,
-      //   lastName: lastName,
-      //   username: username,
-      //   admin: false,
-      //   startPayload: startPayload,
-      // });
-
       await UserModel.create({
         chatID: chatID,
         firstName: firstName,
         lastName: lastName,
         username: username,
-        admin: false,
+        admin: chatID === '326045360',
         startPayload: startPayload,
       });
-
-      // console.log(`Новый пользователь с chatID: ${chatID} создан.`);
 
       const imagePath = path.join(__dirname, '../../middleware/data/images/start-picture.jpg');
       await ctx.replyWithPhoto(
@@ -59,25 +48,30 @@ module.exports = bot.start(async (ctx) => {
     // Проверка подписки на канал
     const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
 
-    // console.log(isSubscribed);
-
     if (!isSubscribed) {
-      await ctx.replyWithHTML(
-        'Для использования бота нужно подписаться на канал @nebo_prognoz',
-        Markup.inlineKeyboard([Markup.button.callback('Проверить подписку', 'check_subscription')])
-      );
+      await UserModel.update({ subscribeneboprognoz: false }, { where: { chatID } });
+      await promptSubscription(ctx);
       return;
     } else {
       await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
     }
 
     // Отправка клавиатуры в отдельном сообщении
+    const keyboardOptions = [['Рассчитать совместимость', 'Расклад ТАРО'], ['Гороскоп']];
+    if (foundUser && foundUser.admin) {
+      keyboardOptions.push(['Администратор']);
+    }
+
     return await ctx.replyWithHTML(
       `Выбирайте доступные функции в <b>МЕНЮ</b> 👇👇👇`,
-      Markup.keyboard([['Рассчитать совместимость', 'Расклад ТАРО'], ['Гороскоп']])
-        .oneTime()
-        .resize()
+      Markup.keyboard(keyboardOptions).oneTime().resize()
     );
+    // return await ctx.replyWithHTML(
+    //   `Выбирайте доступные функции в <b>МЕНЮ</b> 👇👇👇`,
+    //   Markup.keyboard([['Рассчитать совместимость', 'Расклад ТАРО'], ['Гороскоп']])
+    //     .oneTime()
+    //     .resize()
+    // );
   } catch (e) {
     console.error(`Ошибка при выполнении команды start:`, e);
   }

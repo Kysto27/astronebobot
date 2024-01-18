@@ -14,6 +14,7 @@ require('./bot/middleware/command/horoscope.command');
 require('./bot/middleware/hears/one.hears');
 require('./bot/middleware/hears/two.hears');
 require('./bot/middleware/hears/three.hears');
+require('./bot/middleware/hears/admin.hears');
 
 // ACTION
 require('./bot/middleware/action/checkSubscriptionAction');

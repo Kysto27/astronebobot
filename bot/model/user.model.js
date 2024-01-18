@@ -49,6 +49,15 @@ module.exports = db.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    channeljoincount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    lastmessagedelivered: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     timestamps: true,

@@ -35,6 +35,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      love: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      money: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
     },
     {
       timestamps: false,
@@ -44,3 +52,4 @@ module.exports = (sequelize, DataTypes) => {
 
   return TarotCard;
 };
+
