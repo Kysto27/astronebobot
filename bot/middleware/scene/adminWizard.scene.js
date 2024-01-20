@@ -84,32 +84,6 @@ messageEditingStep.action('confirm_send', async (ctx) => {
 
 const confirmationStep = new Composer();
 
-// function sleep(ms) {
-//   return new Promise((resolve) => setTimeout(resolve, ms));
-// }
-
-// confirmationStep.action('send_to_all', async (ctx) => {
-//   const message = ctx.wizard.state.message;
-//   const users = await UserModel.findAll();
-
-//   for (const [index, user] of users.entries()) {
-//     try {
-//       await ctx.telegram.sendMessage(user.chatID, message, { parse_mode: 'MarkdownV2' });
-//       await UserModel.update({ lastMessageDelivered: true }, { where: { chatID: user.chatID } });
-//     } catch (error) {
-//       console.error(`Ошибка при отправке сообщения пользователю ${user.chatID}:`, error);
-//       await UserModel.update({ lastMessageDelivered: false }, { where: { chatID: user.chatID } });
-//     }
-
-//     // Добавление задержки каждые 30 сообщений
-//     if ((index + 1) % 10 === 0) {
-//       await sleep(1000); // Задержка на 1 секунду
-//     }
-//   }
-
-//   await ctx.reply('Сообщение отправлено всем пользователям.');
-//   return ctx.scene.leave();
-// });
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -134,10 +108,10 @@ confirmationStep.action('send_to_all', async (ctx) => {
   for (const [index, user] of users.entries()) {
     try {
       await ctx.telegram.sendMessage(user.chatID, message, { parse_mode: 'MarkdownV2' });
-      await UserModel.update({ lastMessageDelivered: true }, { where: { chatID: user.chatID } });
+      await UserModel.update({ lastmessagedelivered: true }, { where: { chatID: user.chatID } });
     } catch (error) {
       console.error(`Ошибка при отправке сообщения пользователю ${user.chatID}:`, error);
-      await UserModel.update({ lastMessageDelivered: false }, { where: { chatID: user.chatID } });
+      await UserModel.update({ lastmessagedelivered: false }, { where: { chatID: user.chatID } });
     }
 
     // Обновление прогресс-бара каждые 10 сообщений

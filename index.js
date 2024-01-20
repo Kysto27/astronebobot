@@ -23,3 +23,7 @@ require('./bot/middleware/action/checkSubscriptionAction');
 require('./bot/connection/local.connection');
 // require("./bot/connection/lambda.connection");
 
+// Задачи CRON
+
+const scheduleHoroscopeUpdates = require('./bot/middleware/src/getWeeklyHoroscope');
+scheduleHoroscopeUpdates();

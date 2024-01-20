@@ -2,55 +2,11 @@ const { Markup, Scenes, Composer } = require('telegraf');
 const { createZodiacSignsKeyboard } = require('../helpers/zodiacSignsKeyboard.js');
 const { ZodiacSign, ZodiacCompatibility } = require('../../../models/index.js');
 const UserModel = require('../../model/user.model.js');
-// const checkUserSubscription = require('../helpers/subscriptionChecker');
-// const { promptSubscription } = require('../helpers/promptSubscription.js');
 const { handleSubscription } = require('../helpers/sceneSubscription.js');
 
 
 const chooseWomanSignStep = new Composer();
 
-// chooseWomanSignStep.use(async (ctx, next) => {
-//   const chatID = ctx.from.id;
-//   const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
-
-//   if (!isSubscribed) {
-//     await UserModel.update({ subscribeneboprognoz: false }, { where: { chatID } });
-//     await promptSubscription(ctx);
-//   } else {
-//     await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
-//     await enterWomanSignStep(ctx);
-//   }
-// });
-
-// chooseWomanSignStep.use(async (ctx, next) => {
-//   const chatID = ctx.from.id;
-//   const user = await UserModel.findOne({ where: { chatID } });
-
-//   // Сохраняем первоначальный статус подписки, если он еще не был установлен
-//   if (
-//     user.subscribeneboprognoz === false &&
-//     ctx.wizard.state.initialSubscribeStatus === undefined
-//   ) {
-//     ctx.wizard.state.initialSubscribeStatus = 'unsubscribed';
-//   }
-
-//   const isSubscribed = await checkUserSubscription(ctx, '@nebo_prognoz');
-
-//   if (!isSubscribed) {
-//     await UserModel.update({ subscribeneboprognoz: false }, { where: { chatID } });
-//     await promptSubscription(ctx);
-//   } else {
-//     await UserModel.update({ subscribeneboprognoz: true }, { where: { chatID } });
-//     // Проверяем, был ли пользователь ранее не подписанным
-//     if (ctx.wizard.state.initialSubscribeStatus === 'unsubscribed') {
-//       // Увеличиваем счетчик подписок на канал
-//       await UserModel.increment('channeljoincount', { by: 1, where: { chatID } });
-//       // Обновляем статус в контексте wizard
-//       ctx.wizard.state.initialSubscribeStatus = 'subscribed';
-//     }
-//     await enterWomanSignStep(ctx);
-//   }
-// });
 chooseWomanSignStep.use(async (ctx, next) => {
   await handleSubscription(ctx, enterWomanSignStep);
 });

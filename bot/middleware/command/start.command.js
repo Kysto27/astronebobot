@@ -57,7 +57,7 @@ module.exports = bot.start(async (ctx) => {
     }
 
     // Отправка клавиатуры в отдельном сообщении
-    const keyboardOptions = [['Рассчитать совместимость', 'Расклад ТАРО'], ['Гороскоп']];
+    const keyboardOptions = [['Рассчитать совместимость', 'Расклад ТАРО'], ['Гороскопы']];
     if (foundUser && foundUser.admin) {
       keyboardOptions.push(['Администратор']);
     }
@@ -66,12 +66,7 @@ module.exports = bot.start(async (ctx) => {
       `Выбирайте доступные функции в <b>МЕНЮ</b> 👇👇👇`,
       Markup.keyboard(keyboardOptions).oneTime().resize()
     );
-    // return await ctx.replyWithHTML(
-    //   `Выбирайте доступные функции в <b>МЕНЮ</b> 👇👇👇`,
-    //   Markup.keyboard([['Рассчитать совместимость', 'Расклад ТАРО'], ['Гороскоп']])
-    //     .oneTime()
-    //     .resize()
-    // );
+
   } catch (e) {
     console.error(`Ошибка при выполнении команды start:`, e);
   }
