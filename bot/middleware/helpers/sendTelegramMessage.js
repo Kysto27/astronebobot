@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 async function sendTelegramMessage(message, format, chatId) {
-  const telegramBotToken = '6768612737:AAF-FiUlNNvOWeUe6lUaM-Qg7A6llbmwW2I'; // Замените на токен вашего бота
+  const telegramBotToken = ''; // Замените на токен вашего бота
   const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
 
   try {
