@@ -29,18 +29,6 @@ messageSendingStep.action('send_message', async (ctx) => {
 
 const messageReceivingStep = new Composer();
 
-// messageReceivingStep.on('text', async (ctx) => {
-//   ctx.wizard.state.message = ctx.message.text;
-//   await ctx.reply(`Ваше сообщение: "${ctx.wizard.state.message}"`, {
-//     reply_markup: {
-//       inline_keyboard: [
-//         [Markup.button.callback('Изменить текст', 'edit_message')],
-//         [Markup.button.callback('Отправить', 'confirm_send')],
-//       ],
-//     },
-//   });
-//   return ctx.wizard.next();
-// });
 function escapeMarkdown(text) {
   return text.replace(/[_*[\]()~`>#+-=|{}.!]/g, '\\$&');
 }

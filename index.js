@@ -27,3 +27,6 @@ require('./bot/connection/local.connection');
 
 const scheduleHoroscopeUpdates = require('./bot/middleware/src/getWeeklyHoroscope');
 scheduleHoroscopeUpdates();
+
+// const makeLunarDayPost = require('./bot/middleware/src/makeLunarDayPost');
+// makeLunarDayPost();

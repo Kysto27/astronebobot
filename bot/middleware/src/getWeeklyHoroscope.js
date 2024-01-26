@@ -38,28 +38,6 @@ async function fetchAndSaveHoroscope() {
   }
 }
 
-// async function processHoroscopeData(url, Model, zodiacSigns) {
-//   const response = await axios.get(url);
-//   const parser = new xml2js.Parser();
-//   const result = await parser.parseStringPromise(response.data);
-//   const dateRange = result.horo.date[0].$.weekly;
-
-//   for (let i = 0; i < zodiacSigns.length; i++) {
-//     const signData = result.horo[zodiacSigns[i]][0];
-//     const zodiacSignId = i + 1;
-
-//     await Model.upsert({
-//       zodiac_sign_id: zodiacSignId,
-//       date_range: dateRange,
-//       business: signData.business[0].trim(),
-//       common: signData.common[0].trim(),
-//       love: signData.love[0].trim(),
-//       health: signData.health[0].trim(),
-//       beauty: signData.beauty[0].trim(),
-//     });
-//   }
-// }
-
 async function processHoroscopeData(url, Model, zodiacSigns) {
   const response = await axios.get(url);
   const parser = new xml2js.Parser();
@@ -98,7 +76,7 @@ async function processHoroscopeData(url, Model, zodiacSigns) {
   }
 }
 const scheduleHoroscopeUpdates = () => {
-  cron.schedule('50 20 * * 6', () => {
+  cron.schedule('45 13 * * 5', () => {
     console.log('Запуск задачи по сбору данных гороскопа');
     fetchAndSaveHoroscope();
   });
