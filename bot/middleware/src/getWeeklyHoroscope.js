@@ -76,7 +76,7 @@ async function processHoroscopeData(url, Model, zodiacSigns) {
   }
 }
 const scheduleHoroscopeUpdates = () => {
-  cron.schedule('45 13 * * 5', () => {
+  cron.schedule('45 14 * * 5', () => {
     console.log('Запуск задачи по сбору данных гороскопа');
     fetchAndSaveHoroscope();
   });
