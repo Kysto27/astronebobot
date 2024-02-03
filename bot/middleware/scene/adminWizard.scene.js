@@ -103,7 +103,7 @@ confirmationStep.action('send_to_all', async (ctx) => {
     }
 
     // Обновление прогресс-бара каждые 10 сообщений
-    if ((index + 1) % 2 === 0 || index === totalUsers - 1) {
+    if ((index + 1) % 10 === 0 || index === totalUsers - 1) {
       await ctx.telegram.editMessageText(
         ctx.chat.id,
         messageId,
