@@ -1,6 +1,10 @@
 const { Markup, Scenes, Composer } = require('telegraf');
 const { createZodiacSignsKeyboard } = require('../helpers/zodiacSignsKeyboard.js');
-const { ZodiacSign, ZodiacCompatibility, NumerologyCompatibilityDescription } = require('../../../models/index.js');
+const {
+  ZodiacSign,
+  ZodiacCompatibility,
+  NumerologyCompatibilityDescription,
+} = require('../../../models/index.js');
 const UserModel = require('../../model/user.model.js');
 const { handleSubscription } = require('../helpers/sceneSubscription.js');
 const { isValidDate } = require('../helpers/isValidDate.js');
@@ -155,7 +159,7 @@ typeSelectionStep.action('compatibility_numerology', async (ctx) => {
       type: 'numerology',
     };
     await ctx.replyWithHTML(
-`👩‍❤️‍👨 Мы предлагаем Вам узнать интересный нумерологический портрет Вашей пары. Для каждого партнёрства есть своё число, которое отражает всю суть отношений.
+      `👩‍❤️‍👨 Мы предлагаем Вам узнать интересный нумерологический портрет Вашей пары. Для каждого партнёрства есть своё число, которое отражает всю суть отношений.
 
 📅<b>Для расчёта Вам необходимо знать только полную дату рождения.</b>
 
@@ -163,7 +167,8 @@ typeSelectionStep.action('compatibility_numerology', async (ctx) => {
 <blockquote>Например, 10 января 1970 года – дата рождения мужчины, 26 сентября 1976 года – женщины. Складываем цифры: 1+1+1+9+7=19=10=1 (это его цифра) и 2+6+9+1+9+7+6=40=4 (это её цифра). Число пары в сумме составляет 5.</blockquote>
 
 <b>В нашем боте это сделать еще проще, достаточно ввести даты рождения. Мы рассчитаем число вашей пары и дадим его расшифровку.</b>👇👇👇
-`);
+`
+    );
 
     await ctx.reply('👨‍🦰Отправьте сообщением дату рождения мужчины (в формате ДД.ММ.ГГГГ):');
     return ctx.wizard.selectStep(5);
@@ -175,36 +180,124 @@ typeSelectionStep.action('compatibility_numerology', async (ctx) => {
 const enterManBirthdateStep = new Composer();
 
 enterManBirthdateStep.on('text', async (ctx) => {
-  const inputDate = ctx.message.text;
+  const inputText = ctx.message.text;
 
-  if (!isValidDate(inputDate)) {
-    await ctx.reply('Дата введена некорректно, попробуйте снова (в формате ДД.ММ.ГГГГ):');
-    return;
+  switch (inputText) {
+    case 'Рассчитать совместимость':
+      return ctx.scene.enter('oneWizard');
+
+    case '/compatibility':
+      return ctx.scene.enter('oneWizard');
+
+    case 'Расклад ТАРО':
+      return ctx.scene.enter('twoWizard');
+
+    case '/taro':
+      return ctx.scene.enter('twoWizard');
+
+    case 'Гороскопы':
+      return ctx.scene.enter('threeWizard');
+
+    case '/horoscope':
+      return ctx.scene.enter('threeWizard');
+
+    case 'Администратор':
+      return ctx.scene.enter('adminWizard');
+
+    case '/start':
+      await ctx.scene.leave();
+      return await ctx.replyWithHTML(
+        `Вы вышли из текущего раздела.
+Выбирайте доступные функции в <b>МЕНЮ</b> 👇👇👇`
+      );
+
+    default:
+      // Проверка на валидность даты
+      if (!isValidDate(inputText)) {
+        await ctx.reply('Дата введена некорректно, попробуйте снова (в формате ДД.ММ.ГГГГ):');
+        return; // Оставляем пользователя на этом же шаге для повторного ввода
+      }
+
+      // Если текст прошел проверку как валидная дата, продолжаем сценарий
+      ctx.wizard.state.formData.manBirthdate = inputText;
+      await ctx.reply('👩Отправьте сообщением дату рождения женщины (в формате ДД.ММ.ГГГГ):');
+      return ctx.wizard.next();
   }
-
-  ctx.wizard.state.formData.manBirthdate = inputDate;
-  await ctx.reply('👩Отправьте сообщением дату рождения женщины (в формате ДД.ММ.ГГГГ):');
-  return ctx.wizard.next();
 });
 
 const enterWomanBirthdateStep = new Composer();
 
+// enterWomanBirthdateStep.on('text', async (ctx) => {
+//   const inputDate = ctx.message.text;
+
+//   if (inputDate === 'Рассчитать совместимость') {
+//     return ctx.scene.enter('oneWizard');
+//   }
+
+//   if (!isValidDate(inputDate)) {
+//     await ctx.reply('Дата введена некорректно, попробуйте снова (в формате ДД.ММ.ГГГГ):');
+//     return;
+//   }
+
+//   ctx.wizard.state.formData.womanBirthdate = inputDate;
+//   await ctx.reply(
+//     'Нажмите кнопку для расчета совместимости',
+//     Markup.inlineKeyboard([
+//       Markup.button.callback('Рассчитать совместимость', 'calculate_numerology'),
+//     ])
+//   );
+//   return ctx.wizard.next();
+// });
+
 enterWomanBirthdateStep.on('text', async (ctx) => {
-  const inputDate = ctx.message.text;
+  const inputText = ctx.message.text;
 
-  if (!isValidDate(inputDate)) {
-    await ctx.reply('Дата введена некорректно, попробуйте снова (в формате ДД.ММ.ГГГГ):');
-    return;
+  switch (inputText) {
+    case 'Рассчитать совместимость':
+      return ctx.scene.enter('oneWizard');
+
+    case '/compatibility':
+      return ctx.scene.enter('oneWizard');
+
+    case 'Расклад ТАРО':
+      return ctx.scene.enter('twoWizard');
+
+    case '/taro':
+      return ctx.scene.enter('twoWizard');
+
+    case 'Гороскопы':
+      return ctx.scene.enter('threeWizard');
+
+    case '/horoscope':
+      return ctx.scene.enter('threeWizard');
+
+    case 'Администратор':
+      return ctx.scene.enter('adminWizard');
+
+    case '/start':
+      await ctx.scene.leave();
+      return await ctx.replyWithHTML(
+        `Вы вышли из текущего раздела.
+Выбирайте доступные функции в <b>МЕНЮ</b> 👇👇👇`
+      );
+
+    default:
+      // Проверка на валидность даты
+      if (!isValidDate(inputText)) {
+        await ctx.reply('Дата введена некорректно, попробуйте снова (в формате ДД.ММ.ГГГГ):');
+        return; // Оставляем пользователя на этом же шаге для повторного ввода
+      }
+
+      // Если текст прошел проверку как валидная дата, продолжаем сценарий
+      ctx.wizard.state.formData.womanBirthdate = inputText;
+      await ctx.reply(
+        'Нажмите кнопку для расчета совместимости',
+        Markup.inlineKeyboard([
+          Markup.button.callback('Рассчитать совместимость', 'calculate_numerology'),
+        ])
+      );
+      return ctx.wizard.next();
   }
-
-  ctx.wizard.state.formData.womanBirthdate = inputDate;
-  await ctx.reply(
-    'Нажмите кнопку для расчета совместимости',
-    Markup.inlineKeyboard([
-      Markup.button.callback('Рассчитать совместимость', 'calculate_numerology'),
-    ])
-  );
-  return ctx.wizard.next();
 });
 
 const calculateCompatibilityStep = new Composer();
