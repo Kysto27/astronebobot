@@ -24,9 +24,11 @@ require('./bot/connection/local.connection');
 // require("./bot/connection/lambda.connection");
 
 // Задачи CRON
-
 const scheduleHoroscopeUpdates = require('./bot/middleware/src/getWeeklyHoroscope');
 scheduleHoroscopeUpdates();
 
-// const makeLunarDayPost = require('./bot/middleware/src/makeLunarDayPost');
-// makeLunarDayPost();
+const scheduleLunarDayPost = require('./bot/middleware/src/makeLunarDayPost');
+scheduleLunarDayPost();
+
+const scheduledDailyHoroscopeMessage = require('./bot/middleware/src/makeDailyHoroToGroup');
+scheduledDailyHoroscopeMessage();
