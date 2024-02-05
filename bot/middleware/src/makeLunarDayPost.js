@@ -194,7 +194,7 @@ async function createTelegramPosts() {
 }
 
 const scheduleLunarDayPost = () => {
-  cron.schedule('30 20 * * *', () => {
+  cron.schedule('45 20 * * *', () => {
     // console.log('Запуск функции createTelegramPosts() каждый день в 19:00');
     createTelegramPosts().catch((error) =>
       console.error('Ошибка при запуске createTelegramPosts:', error)
