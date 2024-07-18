@@ -32,3 +32,6 @@ scheduleLunarDayPost();
 
 const scheduledDailyHoroscopeMessage = require('./bot/middleware/src/makeDailyHoroToGroup');
 scheduledDailyHoroscopeMessage();
+
+const scheduleDailyHoroscopeToChannel = require('./bot/middleware/src/fetchAndSendDailyHoroscope')
+scheduleDailyHoroscopeToChannel();
